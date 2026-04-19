@@ -9,6 +9,8 @@ const category = document.querySelector("#category");
 //A lista que vai comportar os items de despesa
 const expenseList = document.querySelector("ul");
 
+const expensesQuantity = document.querySelector("aside header p span");
+
 //Tratamento do campo de entrada de valor
 amount.oninput = () => {
   //Expressão regular para capturar letras
@@ -88,15 +90,43 @@ function expenseAdd(newExpense) {
     //Adicionando o que foi criado dentro da estrutura
     expenseInfo.append(expenseName, expenseCategory);
 
+    //Criando o valor da despesa dentro da lista
+    const expenseAmount = document.createElement("span");
+    expenseAmount.classList.add("expense-amount");
+
+    expenseAmount.innerHTML = `<small>R$</small>${newExpense.amount.toUpperCase().replace("R$", "")}`;
+
+    //Criando o botão de remover
+    const expenseRemove = document.createElement("img");
+    expenseRemove.setAttribute("src", "/img/remove.svg");
+    expenseRemove.setAttribute("alt", "Remover");
+    expenseRemove.classList.add("remove-icon");
+
     //Adicionando o icon dentro da lista criada
-    expenseItem.append(expenseIcon, expenseInfo);
+    expenseItem.append(expenseIcon, expenseInfo, expenseAmount, expenseRemove);
 
     //Adicionando a lista dentro de sua estrutura das listas
     expenseList.append(expenseItem);
 
-    console.log(expenseIcon);
+    //Atualiza o total da lista
+    updateTotals();
   } catch (error) {
     alert("Não foi possível atualizar a lista de despesas.");
+    console.log(error);
+  }
+}
+
+//Função que vai atualizar o quantitativo de despesa quanto o preço acumulativo de despesa
+
+function updateTotals() {
+  try {
+    //Vai recuperar todos os items da lista
+    const items = expenseList.children;
+
+    //atualização de quantidade de item da lista
+    expensesQuantity.textContent = `${items.length} ${items.length > 1 ? "despesas" : "despesa"}`;
+  } catch (error) {
+    alert("Não foi possível atualizar os totais");
     console.log(error);
   }
 }
