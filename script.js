@@ -11,6 +11,9 @@ const expenseList = document.querySelector("ul");
 
 const expensesQuantity = document.querySelector("aside header p span");
 
+const expensesTotal = document.querySelector("aside header h2");
+console.log(expensesTotal);
+
 //Tratamento do campo de entrada de valor
 amount.oninput = () => {
   //Expressão regular para capturar letras
@@ -110,6 +113,9 @@ function expenseAdd(newExpense) {
 
     //Atualiza o total da lista
     updateTotals();
+
+    //Limpar os campos
+    formClear();
   } catch (error) {
     alert("Não foi possível atualizar a lista de despesas.");
     console.log(error);
@@ -125,8 +131,65 @@ function updateTotals() {
 
     //atualização de quantidade de item da lista
     expensesQuantity.textContent = `${items.length} ${items.length > 1 ? "despesas" : "despesa"}`;
+
+    let total = 0;
+
+    for (let item = 0; item < items.length; item++) {
+      let itemAmount = items[item].querySelector(".expense-amount");
+      //Removendo caracteres nao numeros e substitui a virgula pelo ponto
+      let value = itemAmount.textContent
+        //Expressão que pega todo o tipo de caractere não numérico
+        .replace(/[^\d,]/g, "")
+        //Substitui virgula por ponto
+        .replace(",", ".");
+
+      //Converte o valor para ponto flutuante
+      value = parseFloat(value);
+
+      //Verifica se o valor realmente é um número, se não emite um alerta
+      if (isNaN(value)) {
+        alert(
+          "Não foi possível calcular o total, o valor não parece ser um número",
+        );
+      }
+
+      //Atualizando o total
+      total += Number(value);
+    }
+
+    //Criando a small para comportar o symbol R$
+    const symbolBRL = document.createElement("small");
+    symbolBRL.textContent = "R$";
+
+    //Pegando o valor sem o R$, removendo o mesmo
+    total = formatCurrencyBRL(total).toUpperCase().replace("R$", "");
+
+    //Limpando o conteudo inteiro por dentro
+    expensesTotal.innerHTML = "";
+
+    //adicionando o simbolo e o valor formatado
+    expensesTotal.append(symbolBRL, total);
   } catch (error) {
     alert("Não foi possível atualizar os totais");
     console.log(error);
   }
+}
+
+//Evento que vai remover o item
+expenseList.addEventListener("click", (event) => {
+  if (event.target.classList.contains("remove-icon")) {
+    const item = event.target.closest(".expense");
+
+    item.remove();
+  }
+
+  updateTotals();
+});
+
+function formClear() {
+  expense.value = "";
+  category.value = "";
+  amount.value = "";
+
+  expense.focus();
 }
